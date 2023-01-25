@@ -63,15 +63,24 @@ module.exports = {
         const entries = [];
 
         collector.on('collect', async (button) => {
-            if (button.user.id === client.user.id) return;
+            if (button.user.id === client.user.id) 
+            if (entries.includes(button.user.id)) {
+                entries.splice(entries.indexOf(button.user.id), 1);
+                embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: ${entries.length}\nWinners: ${winners}`);
+                await msg.edit({ embeds: [embed] });
+                return await button.reply({ content: 'You have cancelled your entry.', ephemeral: true });
+            }
+
             entries.push(button.user.id);
             embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: ${entries.length}\nWinners: ${winners}`);
             await msg.edit({ embeds: [embed] });
-            await button.deferUpdate();
+            await button.reply({ content: 'You have entered the giveaway!', ephemeral: true });
         });
 
         collector.on('end', async () => {
+            let announce;
             if (entries.length === 0) {
+                announce = `No one entered the giveaway!`;
                 embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: 0\nWinners: ${winners}\n\nNo one entered the giveaway!`);
                 await msg.edit({ embeds: [embed], components: [] });
                 return;
@@ -87,6 +96,10 @@ module.exports = {
 
             embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: ${entries.length}\nWinners: ${winner.map((id) => `<@${id}>`).join(', ')}`);
             await msg.edit({ embeds: [embed], components: [] });
+
+            announce = `Congratulations ${winner.map((id) => `<@${id}>`).join(', ')}! You won **${prize}**!`;
+
+            await channel.send({ content: announce });
         });
     }
 }
