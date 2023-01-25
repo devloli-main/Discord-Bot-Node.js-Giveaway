@@ -63,18 +63,17 @@ module.exports = {
         const entries = [];
 
         collector.on('collect', async (button) => {
-            if (button.user.id === client.user.id) 
+            if (button.user.id === client.user.id) return;
+
             if (entries.includes(button.user.id)) {
                 entries.splice(entries.indexOf(button.user.id), 1);
-                embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: ${entries.length}\nWinners: ${winners}`);
-                await msg.edit({ embeds: [embed] });
-                return await button.reply({ content: 'You have cancelled your entry.', ephemeral: true });
+            } else {
+                entries.push(button.user.id);
             }
 
-            entries.push(button.user.id);
             embed.setDescription(`Hosted by: ${host}\nEnds at: <t:${Math.floor(end / 1000)}:R>\nEntries: ${entries.length}\nWinners: ${winners}`);
             await msg.edit({ embeds: [embed] });
-            await button.reply({ content: 'You have entered the giveaway!', ephemeral: true });
+            await button.reply({ content: `You have ${entries.includes(button.user.id) ? 'entered' : 'cancelled'} the giveaway!`, ephemeral: true });
         });
 
         collector.on('end', async () => {
