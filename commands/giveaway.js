@@ -5,7 +5,7 @@ module.exports = {
         .setName('giveaway')
         .setDescription('🎁 Create a giveaway! /giveaway <channel> <host> <duration> <winners> <prize>')
         .addChannelOption(option => option.setName('channel').setDescription('The channel of the giveaway.').setRequired(true))
-        .addStringOption(option => option.setName('host').setDescription('The host of the giveaway.').setRequired(true))
+        .addUserOption(option => option.setName('host').setDescription('The host of the giveaway.').setRequired(true))
         .addStringOption(option => option.setName('duration').setDescription('The duration of the giveaway. (10 minutes, 30 minutes or 1 hour)').setRequired(true)
             .addChoices(
                 { name: '10 seconds', value: '10s' },
@@ -20,7 +20,7 @@ module.exports = {
 
     async execute(interaction, client) {
         const channel = interaction.options.getChannel('channel');
-        const host = interaction.options.getString('host');
+        const host = interaction.options.getUser('host');
         let duration = interaction.options.getString('duration');
         const winners = interaction.options.getInteger('winners');
         const prize = interaction.options.getString('prize');
@@ -99,6 +99,7 @@ module.exports = {
 
             announce = `Congratulations ${winner.map((id) => `<@${id}>`).join(', ')}! You won **${prize}**!`;
 
+            // announce winners
             await channel.send({ content: announce });
         });
     }
